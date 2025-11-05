@@ -1,16 +1,24 @@
 
+using E_Commerce.Domain.Contracts;
+using E_Commerce.Persistence.Data.DataSeed;
 using E_Commerce.Persistence.Data.DbContexts;
+using E_Commerce.Persistence.Repositories;
+using E_Commerce.Services;
+using E_Commerce.Services.MappingProfiles;
+using E_Commerce.Services_Abstraction;
+using E_Commerce.Web.Extensions;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace E_Commerce.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            #region Add services to the container.
+            #region Add services to the container
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -20,11 +28,26 @@ namespace E_Commerce.Web
             {
                  options.UseSqlServer(builder.Configuration.GetConnectionString( "DefaultConnection"));
             });
-                 
 
+            builder.Services.AddScoped<IDataInitializer, DataInitializer>();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();  
+            //builder.Services.AddAutoMapper(X => X.AddProfile<ProductProfile>());
+            builder.Services.AddTransient<ProductPictureUrlResolver>(); 
+            builder.Services.AddScoped<IProductService, ProductService>();
+
+            builder.Services.AddAutoMapper(typeof(ServicesAssemblyReference).Assembly);
 
             #endregion
+
             var app = builder.Build();
+
+            #region Data Seeding
+
+            await app.MigrateDatabaseAsync();
+            await app.SeedDatabaseAsync();
+
+            #endregion
+
             #region Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
@@ -34,13 +57,15 @@ namespace E_Commerce.Web
 
             app.UseHttpsRedirection();
 
-            //app.UseAuthorization();
+            app.UseStaticFiles();
+            app.UseAuthorization();
 
 
             app.MapControllers();
 
             #endregion
-            app.Run();
+
+             await  app.RunAsync();
         }
     }
 }

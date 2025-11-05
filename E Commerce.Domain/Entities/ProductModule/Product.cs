@@ -14,10 +14,10 @@ namespace E_Commerce.Domain.Entities.ProductModule
         public decimal Price { get; set; }
 
         #region Relationships
-        public int BrandId { get; set; }
         public ProductBrand ProductBrand { get; set; } = default!;
-        public int TypeId { get; set; }
+        public int BrandId { get; set; }
         public ProductType ProductType { get; set; } = default!;
+        public int TypeId { get; set; }
         #endregion
     }
 }
