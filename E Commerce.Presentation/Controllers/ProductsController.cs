@@ -1,4 +1,5 @@
-﻿using E_Commerce.Services_Abstraction;
+﻿using E_Commerce.Presentation.Attributes;
+using E_Commerce.Services_Abstraction;
 using E_Commerce.Shared;
 using E_Commerce.Shared.DTOs.ProductsDTOs;
 using Microsoft.AspNetCore.Mvc;
@@ -21,8 +22,9 @@ namespace E_Commerce.Presentation.Controllers
             _productService = productService;
         }
 
-        // GetAllProducts (from image_0c03d7.png)
+
         [HttpGet]
+        [RedisCache]
         // GET : BaseUrl/api/Products
         public async Task<ActionResult<PaginatedResult<ProductDTO>>> GetAllProducts([FromQuery]ProductQueryParams queryParams)
         {
